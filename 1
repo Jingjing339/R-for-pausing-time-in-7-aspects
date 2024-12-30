@@ -1,0 +1,161 @@
+#setting the working directory
+rm(list = ls())
+setwd(choose.dir())   
+
+library("openxlsx")
+data1=read.xlsx("pre revision grade.xlsx")
+
+library(tidyverse)
+data2 = as_tibble(pivot_longer(data1,cols = c(Rater1,Rater2), names_to = "Test", values_to = "Score"))|> glimpse()
+
+cor(data1[,4:5],method = "spearman")
+
+library("openxlsx")
+data3=read.xlsx("post revision grade.xlsx")
+library(tidyverse)
+data4 = as_tibble(pivot_longer(data3,cols = c(Rater1,Rater2), names_to = "Test", values_to = "Score"))|> glimpse()
+cor(data3[,4:5],method = "spearman")
+
+library("openxlsx")
+data5=read.xlsx("for paired T.xlsx")
+library(tidyverse)
+data6 = as_tibble(pivot_longer(data5,cols = c(Pre,Post), names_to = "Test", values_to = "Score"))|> glimpse()
+
+library(dplyr)
+Descriptive1 <- data6 |> group_by(Qfactor,Test) |> summarise(Mean_Score = mean(Score), SD=sd(Score), samplesize=n())
+Descriptive1 
+pre <- data6 |> filter(Test == "Pre") |> glimpse()
+mean(pre$Score)
+sd(pre$Score)       
+post <- data6 |> filter(Test == "Post") |> glimpse()
+mean(post$Score)
+sd(post$Score)      
+#pairedT
+F1 <- data6 |> filter(Qfactor == "A")
+t.test(Score~Test,data=F1,paired=TRUE)  
+
+F1pre_mean <- mean(F1$Score[F1$Test == "Pre"])
+F1pre_sd <- sd(F1$Score[F1$Test == "Pre"])
+
+F1post_mean <- mean(F1$Score[F1$Test == "Post"])
+F1post_sd <- sd(F1$Score[F1$Test == "Post"])
+
+F2<- data6 |> filter(Qfactor == "B")
+t.test(Score~Test,data=F2,paired=TRUE)  
+
+F2pre_mean <- mean(F2$Score[F2$Test == "Pre"])
+F2pre_sd <- sd(F2$Score[F2$Test == "Pre"])
+
+F2post_mean <- mean(F2$Score[F2$Test == "Post"])
+F2post_sd <- sd(F2$Score[F2$Test == "Post"])
+F3 <- data6 |> filter(Qfactor == "C")
+t.test(Score~Test,data=F3,paired=TRUE)  
+
+F3pre_mean <- mean(F3$Score[F3$Test == "Pre"])
+F3pre_sd <- sd(F3$Score[F3$Test == "Pre"])
+
+F3post_mean <- mean(F3$Score[F3$Test == "Post"])
+F3post_sd <- sd(F3$Score[F3$Test == "Post"])
+
+
+
+model1=aov(Pre~Qfactor,data=data5)                        
+summary(model1)                                          
+library(carData)
+library(car)
+leveneTest(Pre~Qfactor,data=data5)                      
+TukeyHSD(model1)                                        
+
+model2=aov(Post~Qfactor,data=data5)                        
+summary(model2)                                          
+library(carData)
+library(car)
+leveneTest(Post~Qfactor,data=data5)                      
+TukeyHSD(model2)                                         
+
+
+data5$Gain <- data5$Post - data5$Pre
+data5$Group <- as.factor(data5$Qfactor)
+model_gain <- aov(Gain ~ Qfactor, data = data5)
+summary(model_gain)
+TukeyHSD(model_gain)
+
+
+library("openxlsx")
+data7=read.xlsx("for 7 dimensions ANOVA.xlsx")
+library("openxlsx")
+data8=read.xlsx("for inter-rater(7 dimen).xlsx")
+cor(data8[,5:6],method = "spearman")
+cor(data8[,7:8],method = "spearman")
+cor(data8[,9:10],method = "spearman")
+cor(data8[,11:12],method = "spearman")
+cor(data8[,13:14],method = "spearman")
+cor(data8[,15:16],method = "spearman")
+cor(data8[,17:18],method = "spearman")
+#lexicon
+data7$Group <- as.factor(data7$Qfactor)
+model_lexicon <- aov(Lexicon ~ Qfactor, data = data7)
+summary(model_lexicon)
+TukeyHSD(model_lexicon)
+#semantic
+model_semantic <- aov(Semantic ~ Qfactor, data = data7)
+summary(model_semantic)
+TukeyHSD(model_semantic)
+#discourse
+model_discourse <- aov(Discourse ~ Qfactor, data = data7)
+summary(model_discourse)
+TukeyHSD(model_discourse)
+#alignment
+model_alignment <- aov(Alignment ~ Qfactor, data = data7)
+summary(model_alignment)
+TukeyHSD(model_alignment)
+#content
+model_content <- aov(Content ~ Qfactor, data = data7)
+summary(model_content)
+TukeyHSD(model_content)
+#linguistics
+model_linguistics <- aov(Linguistics ~ Qfactor, data = data7)
+summary(model_linguistics)
+TukeyHSD(model_linguistics)
+#typology
+model_typology <- aov(Typology ~ Qfactor, data = data7)
+summary(model_typology)
+TukeyHSD(model_typology)
+#每个Q组在7单项上的描述统计数据
+#lexicon
+library(dplyr)
+Descriptive_lexicon <- data7 %>%
+  group_by(Qfactor) %>%
+  summarise(Mean_Lexicon = mean(Lexicon), SD_Lexicon = sd(Lexicon), SampleSize = n())
+Descriptive_lexicon
+#semantic
+Descriptive_semantic <- data7 %>%
+  group_by(Qfactor) %>%
+  summarise(Mean_Semantic = mean(Semantic), SD_Semantic = sd(Semantic), SampleSize = n())
+Descriptive_semantic
+#discourse
+Descriptive_discourse <- data7 %>%
+  group_by(Qfactor) %>%
+  summarise(Mean_Discourse = mean(Discourse), SD_Discourse = sd(Discourse), SampleSize = n())
+Descriptive_discourse
+#alignment
+Descriptive_alignment <- data7 %>%
+  group_by(Qfactor) %>%
+  summarise(Mean_Alignment = mean(Alignment), SD_Alignment = sd(Alignment), SampleSize = n())
+Descriptive_alignment
+#content
+Descriptive_content <- data7 %>%
+  group_by(Qfactor) %>%
+  summarise(Mean_Content = mean(Content), SD_Content = sd(Content), SampleSize = n())
+Descriptive_content
+#linguistics
+Descriptive_linguistics <- data7 %>%
+  group_by(Qfactor) %>%
+  summarise(Mean_Linguistics = mean(Linguistics), SD_Linguistics = sd(Linguistics), SampleSize = n())
+Descriptive_linguistics
+#typology
+Descriptive_typology <- data7 %>%
+  group_by(Qfactor) %>%
+  summarise(Mean_Typology = mean(Typology), SD_Lexicon = sd(Typology), SampleSize = n())
+Descriptive_typology
+
